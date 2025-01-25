@@ -10,6 +10,7 @@
 
 #include "viewport.h"
 #include "render.h"
+#include "ground.h"
 
 using namespace sf;
 using std::cerr;
@@ -27,6 +28,7 @@ Renderer * renderer = NULL;
 SpriteSheet * sprites = NULL;
 Camera * camera = NULL;
 Camera * uiCamera = NULL;
+Ground * ground = NULL;
 
 int main() {
 
@@ -37,6 +39,9 @@ int main() {
     window->setFramerateLimit(60);    
 
     sprites = new SpriteSheet("images/sprites.png");
+
+    ground = new Ground();
+    ground->initLevel(sprites);
 
     camera = new Camera(Vector2f(0., 0.));
     uiCamera = new Camera();
@@ -88,6 +93,8 @@ int main() {
 
         renderer->clear();
 
+        ground->render(renderer, camera);
+
         renderer->drawSpriteRot(SSprite(sprites, 0, 0, 32, 32), Vector2f(64., 64.) + Vector2f(cos(time*2.), sin(time*2.)) * 12.f, time, camera);
         renderer->drawSprite(SSprite(sprites, 0, 0, 32, 32), Vector2f(64., 64.), camera);
         renderer->drawSpriteRot(SSprite(sprites, 0, 0, 32, 32), Vector2f(64., 64.) + Vector2f(cos(-time*2.), sin(-time*2.)) * 12.f, -time * 4., camera);
@@ -97,6 +104,7 @@ int main() {
         window->display();
     }
 
+    delete ground;
     delete sprites;
     delete renderer;
     delete camera;

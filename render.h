@@ -9,10 +9,22 @@ using std::endl;
 
 const int REN_WIDTH = 320, REN_HEIGHT = 240;
 
-float max ( float a, float b ) {
+static float max ( float a, float b ) {
     return a > b ? a : b;
 }
-float min ( float a, float b ) {
+static float min ( float a, float b ) {
+    return a < b ? a : b;
+}
+static int max ( int a, int b ) {
+    return a > b ? a : b;
+}
+static int min ( int a, int b ) {
+    return a < b ? a : b;
+}
+static double max ( double a, double b ) {
+    return a > b ? a : b;
+}
+static double min ( double a, double b ) {
     return a < b ? a : b;
 }
 
@@ -81,6 +93,13 @@ public:
     }
     ~SpriteSheet() {
     }
+
+    uint32_t getPixel(int x, int y) {
+        if (x<0 || y<0 || x>=size.x || y>=size.y) {
+            return 0;
+        }
+        return bfr[x + y * size.x];
+    }
 };
 
 class SSprite {
@@ -141,7 +160,7 @@ public:
             if ((y+p.y) < 0) {
                 continue;
             }
-            uint32_t const * rptr = sprite.sheet->bfr + (sprite.pos.y + y) * sprite.sheet->size.x;
+            uint32_t const * rptr = sprite.sheet->bfr + (sprite.pos.y + y) * sprite.sheet->size.x + sprite.pos.x;
             uint32_t * wptr = bfr + (y + p.y) * REN_WIDTH + p.x;
             for (int x = 0; x < sprite.size.x; x++) {
                 if ((x+p.x) >= REN_WIDTH) {
@@ -167,6 +186,9 @@ public:
         const int ca = (int)(cos(-angle)*10000.f), sa = (int)(sin(-angle)*10000.f);
         const int r = (int)ceilf(sqrtf((sprite.size.x, sprite.size.y) * max(sprite.size.x, sprite.size.y) / 2));
 
+        const int cx = sprite.size.x / 2,
+                  cy = sprite.size.y / 2;
+
         for (int y = -r; y <= r; y++) {
             const int wy = p.y + y;
             if (wy < 0 || wy >= REN_HEIGHT) {
@@ -178,8 +200,8 @@ public:
                 if (wx < 0 || wx >= REN_WIDTH) {
                     continue;
                 }
-                const int rx = (x * ca - y * sa) / 10000 + sprite.pos.x + sprite.size.x / 2,
-                          ry = (y * ca + x * sa) / 10000 + sprite.pos.y + sprite.size.y / 2;
+                const int rx = (x * ca - y * sa) / 10000 + sprite.pos.x + cx,
+                          ry = (y * ca + x * sa) / 10000 + sprite.pos.y + cy;
                 if (rx >= sprite.pos.x && ry >= sprite.pos.y && rx < (sprite.pos.x + sprite.size.x) && ry < (sprite.pos.y + sprite.size.y)) {
                     const uint32_t v = sprite.sheet->bfr[rx + ry * sprite.sheet->size.x];
                     if (v > 0) {
