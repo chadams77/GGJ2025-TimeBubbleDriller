@@ -9,6 +9,13 @@ using std::endl;
 
 const int REN_WIDTH = 320, REN_HEIGHT = 240;
 
+float max ( float a, float b ) {
+    return a > b ? a : b;
+}
+float min ( float a, float b ) {
+    return a < b ? a : b;
+}
+
 class Camera {
 private:
     Vector2f hsz;
@@ -146,6 +153,38 @@ public:
                 uint32_t v = rptr[x];
                 if (v > 0) {
                     wptr[x] = v;
+                }
+            }
+        }
+    }
+
+    void drawSpriteRot(SSprite sprite, Vector2f wp, float angle, Camera * camera) {
+        Vector2f p = camera->project(wp);
+        drawSpriteRot(sprite, Vector2i(roundf(p.x), roundf(p.y)), angle);
+    }
+
+    void drawSpriteRot(SSprite sprite, Vector2i p, float angle) {
+        const int ca = (int)(cos(-angle)*1000.f), sa = (int)(sin(-angle)*1000.f);
+        const int r = (int)ceilf(sqrtf((sprite.size.x, sprite.size.y) * max(sprite.size.x, sprite.size.y) / 2));
+
+        for (int y = -r; y <= r; y++) {
+            const int wy = p.y + y;
+            if (wy < 0 || wy >= REN_HEIGHT) {
+                continue;
+            }
+            uint32_t * wptr = bfr + wy * REN_WIDTH;
+            for (int x = -r; x <= r; x++) {
+                const int wx = x + p.x;
+                if (wx < 0 || wx >= REN_WIDTH) {
+                    continue;
+                }
+                const int rx = x * ca / 1000 - y * sa / 1000 + sprite.pos.x + sprite.size.x / 2,
+                          ry = y * ca / 1000 + x * sa / 1000 + sprite.pos.y + sprite.size.y / 2;
+                if (rx >= sprite.pos.x && ry >= sprite.pos.y && rx < (sprite.pos.x + sprite.size.x) && ry < (sprite.pos.y + sprite.size.y)) {
+                    const uint32_t v = sprite.sheet->bfr[rx + ry * sprite.sheet->size.x];
+                    if (v > 0) {
+                        wptr[wx] = v;
+                    }
                 }
             }
         }

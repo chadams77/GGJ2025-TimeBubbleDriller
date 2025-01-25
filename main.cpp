@@ -86,7 +86,7 @@ int main() {
 
         renderer->clear();
 
-        renderer->drawSprite(SSprite(sprites, 0, 0, 32, 32), Vector2i(59, 59));
+        renderer->drawSpriteRot(SSprite(sprites, 0, 0, 32, 32), Vector2i(64, 64), time);
         renderer->drawSprite(SSprite(sprites, 0, 0, 32, 32), Vector2i(64, 64));
 
         renderer->render(window, dt);
