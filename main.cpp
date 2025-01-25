@@ -9,6 +9,7 @@
 #include <SFML/Audio.hpp>
 
 #include "viewport.h"
+#include "render.h"
 
 using namespace sf;
 using std::cerr;
@@ -22,6 +23,9 @@ const char * WINDOW_TITLE = "Time-Bubble Driller";
 const double PI = 3.1415926535897932;
 
 RenderWindow * window = NULL;
+Renderer * renderer = NULL;
+Camera * camera = NULL;
+Camera * uiCamera = NULL;
 
 int main() {
 
@@ -29,8 +33,12 @@ int main() {
 
     window = new RenderWindow(VideoMode(800, 600), WINDOW_TITLE);
     window->setMouseCursorVisible(false);
-
     window->setFramerateLimit(60);    
+
+    camera = new Camera(Vector2f(0., 0.));
+    uiCamera = new Camera();
+
+    renderer = new Renderer();
 
     double time = 0.;
     bool lMouseLeft = false, lMouseRight = false;
@@ -48,7 +56,11 @@ int main() {
                 if (event.key.code == Keyboard::Key::F11) {
                     fullscreen = !fullscreen;
                     delete window;
-                    window = new RenderWindow(fullscreen ? VideoMode::getDesktopMode() : VideoMode(800, 600), WINDOW_TITLE, fullscreen ? Style::Fullscreen : Style::Default);
+                    window = new RenderWindow(
+                        fullscreen ? VideoMode::getDesktopMode() : VideoMode(800, 600),
+                        WINDOW_TITLE,
+                        fullscreen ? Style::Fullscreen : Style::Default
+                    );
                     window->setFramerateLimit(60);
                     OnResize(window);
                 }
@@ -67,9 +79,16 @@ int main() {
         double dt = 1. / 60.;
         time += dt;
 
+        renderer->render(window, dt);
+
+        camera->update(dt);
+
         window->display();
     }
 
+    delete renderer;
+    delete camera;
+    delete uiCamera;
     delete window;
 
     return 0;
