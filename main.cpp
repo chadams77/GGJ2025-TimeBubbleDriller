@@ -91,6 +91,8 @@ int main() {
 
         camera->update(dt);
 
+        ground->update(camera, dt);
+
         renderer->clear();
 
         ground->render(renderer, camera);
