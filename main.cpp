@@ -45,6 +45,8 @@ int main() {
 
     double time = 0.;
     bool lMouseLeft = false, lMouseRight = false;
+
+    camera->lookAtSmooth(Vector2f(128., 128.), 0.5f);
     
     while (window->isOpen()) {
         Event event;
@@ -86,8 +88,9 @@ int main() {
 
         renderer->clear();
 
-        renderer->drawSpriteRot(SSprite(sprites, 0, 0, 32, 32), Vector2i(64, 64), time);
-        renderer->drawSprite(SSprite(sprites, 0, 0, 32, 32), Vector2i(64, 64));
+        renderer->drawSpriteRot(SSprite(sprites, 0, 0, 32, 32), Vector2f(64., 64.) + Vector2f(cos(time*2.), sin(time*2.)) * 12.f, time, camera);
+        renderer->drawSprite(SSprite(sprites, 0, 0, 32, 32), Vector2f(64., 64.), camera);
+        renderer->drawSpriteRot(SSprite(sprites, 0, 0, 32, 32), Vector2f(64., 64.) + Vector2f(cos(-time*2.), sin(-time*2.)) * 12.f, -time * 4., camera);
 
         renderer->render(window, dt);
 

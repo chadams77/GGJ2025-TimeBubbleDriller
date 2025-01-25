@@ -164,7 +164,7 @@ public:
     }
 
     void drawSpriteRot(SSprite sprite, Vector2i p, float angle) {
-        const int ca = (int)(cos(-angle)*1000.f), sa = (int)(sin(-angle)*1000.f);
+        const int ca = (int)(cos(-angle)*10000.f), sa = (int)(sin(-angle)*10000.f);
         const int r = (int)ceilf(sqrtf((sprite.size.x, sprite.size.y) * max(sprite.size.x, sprite.size.y) / 2));
 
         for (int y = -r; y <= r; y++) {
@@ -178,8 +178,8 @@ public:
                 if (wx < 0 || wx >= REN_WIDTH) {
                     continue;
                 }
-                const int rx = x * ca / 1000 - y * sa / 1000 + sprite.pos.x + sprite.size.x / 2,
-                          ry = y * ca / 1000 + x * sa / 1000 + sprite.pos.y + sprite.size.y / 2;
+                const int rx = (x * ca - y * sa) / 10000 + sprite.pos.x + sprite.size.x / 2,
+                          ry = (y * ca + x * sa) / 10000 + sprite.pos.y + sprite.size.y / 2;
                 if (rx >= sprite.pos.x && ry >= sprite.pos.y && rx < (sprite.pos.x + sprite.size.x) && ry < (sprite.pos.y + sprite.size.y)) {
                     const uint32_t v = sprite.sheet->bfr[rx + ry * sprite.sheet->size.x];
                     if (v > 0) {
