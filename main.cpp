@@ -24,6 +24,7 @@ const double PI = 3.1415926535897932;
 
 RenderWindow * window = NULL;
 Renderer * renderer = NULL;
+SpriteSheet * sprites = NULL;
 Camera * camera = NULL;
 Camera * uiCamera = NULL;
 
@@ -34,6 +35,8 @@ int main() {
     window = new RenderWindow(VideoMode(800, 600), WINDOW_TITLE);
     window->setMouseCursorVisible(false);
     window->setFramerateLimit(60);    
+
+    sprites = new SpriteSheet("images/sprites.png");
 
     camera = new Camera(Vector2f(0., 0.));
     uiCamera = new Camera();
@@ -79,13 +82,19 @@ int main() {
         double dt = 1. / 60.;
         time += dt;
 
-        renderer->render(window, dt);
-
         camera->update(dt);
+
+        renderer->clear();
+
+        renderer->drawSprite(SSprite(sprites, 0, 0, 32, 32), Vector2i(59, 59));
+        renderer->drawSprite(SSprite(sprites, 0, 0, 32, 32), Vector2i(64, 64));
+
+        renderer->render(window, dt);
 
         window->display();
     }
 
+    delete sprites;
     delete renderer;
     delete camera;
     delete uiCamera;

@@ -1,5 +1,11 @@
+#include <iostream>
+
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
+
+using std::cerr;
+using std::cout;
+using std::endl;
 
 const int REN_WIDTH = 320, REN_HEIGHT = 240;
 
@@ -48,6 +54,44 @@ public:
     }
 };
 
+class SpriteSheet {
+private:
+    Texture texture;
+    Image image;
+public:
+    uint32_t const * bfr;
+    Vector2i size;
+
+    SpriteSheet(const char * filename) {
+        if (!texture.loadFromFile(filename)) {
+            cerr << "Sprite sheet not found: " << filename << endl;
+            exit(0);
+        }
+
+        image = texture.copyToImage();
+        bfr = (uint32_t const *)image.getPixelsPtr();
+        size = Vector2i(image.getSize().x, image.getSize().y);
+    }
+    ~SpriteSheet() {
+    }
+};
+
+class SSprite {
+public:
+    SpriteSheet * sheet;
+    Vector2i pos, size;
+    SSprite(SpriteSheet * _sheet, int x, int y, int w = 16, int h = 16) {
+        sheet = _sheet;
+        pos.x = x; pos.y = y;
+        size.x = w; size.y = h;
+    }
+    SSprite(const SSprite & b) {
+        sheet = b.sheet;
+        pos = b.pos;
+        size = b.size;
+    }
+};
+
 class Renderer {
 public:
     Texture texture;
@@ -63,6 +107,48 @@ public:
 
     ~Renderer() {
         delete bfr;
+    }
+
+    void clear(uint32_t clr = 0x000000FF) {
+        uint32_t * ptr = bfr, * endPtr = bfr + (REN_WIDTH * REN_HEIGHT);
+        while (ptr != endPtr) {
+            *ptr = clr;
+            ptr++;
+        }
+    }
+
+    void drawSprite(SSprite sprite, Vector2f wp, Camera * camera) {
+        Vector2f p = camera->project(wp);
+        drawSprite(sprite, Vector2i(roundf(p.x), roundf(p.y)));
+    }
+
+    void drawSprite(SSprite sprite, Vector2i p) {
+        Vector2i bottom = p + sprite.size;
+        if (bottom.x < 0 || bottom.y < 0 || p.x >= REN_WIDTH || p.y >= REN_HEIGHT) {
+            return;
+        }
+        for (int y = 0; y < sprite.size.y; y++) {
+            if ((y+p.y) >= REN_HEIGHT) {
+                return;
+            }
+            if ((y+p.y) < 0) {
+                continue;
+            }
+            uint32_t const * rptr = sprite.sheet->bfr + (sprite.pos.y + y) * sprite.sheet->size.x;
+            uint32_t * wptr = bfr + (y + p.y) * REN_WIDTH + p.x;
+            for (int x = 0; x < sprite.size.x; x++) {
+                if ((x+p.x) >= REN_WIDTH) {
+                    break;
+                }
+                if ((x+p.x) < 0) {
+                    continue;
+                }
+                uint32_t v = rptr[x];
+                if (v > 0) {
+                    wptr[x] = v;
+                }
+            }
+        }
     }
 
     void render(RenderWindow * window, float dt) {
