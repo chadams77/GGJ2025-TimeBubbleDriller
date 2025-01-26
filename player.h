@@ -54,6 +54,9 @@ public:
             digf += (1.f - f);
         }
         else if (!loose) {
+            if (!win) {
+                ngold *= 2.f;
+            }
             win = true;
         }
 

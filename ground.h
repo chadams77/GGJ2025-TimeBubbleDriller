@@ -85,12 +85,12 @@ public:
     void initLevel (SpriteSheet * sprites) {
         srand(time(0));
 
-        PAL_BROWN_1 = sprites->getPixel(4 * 32 + 0, 0);
-        PAL_BROWN_2 = sprites->getPixel(4 * 32 + 1, 0);
+        PAL_BROWN_1 = blend(sprites->getPixel(4 * 32 + 0, 0), 0x000000FF, 0.35f);
+        PAL_BROWN_2 = blend(sprites->getPixel(4 * 32 + 1, 0), 0x000000FF, 0.35f);
         PAL_BLUE_1 = sprites->getPixel(4 * 32 + 2, 0);
         PAL_BLUE_2 = sprites->getPixel(4 * 32 + 3, 0);
-        PAL_GREY_1 = sprites->getPixel(4 * 32 + 4, 0);
-        PAL_GREY_2 = sprites->getPixel(4 * 32 + 5, 0);
+        PAL_GREY_1 = blend(sprites->getPixel(4 * 32 + 4, 0), 0x000000FF, 0.35f);
+        PAL_GREY_2 = blend(sprites->getPixel(4 * 32 + 5, 0), 0x000000FF, 0.35f);
         PAL_GREEN_1 = sprites->getPixel(4 * 32 + 6, 0);
         PAL_GREEN_2 = sprites->getPixel(4 * 32 + 7, 0);
         PAL_PINK_1 = sprites->getPixel(4 * 32 + 8, 0);
@@ -151,7 +151,7 @@ public:
         for (int x=1; x<(TER_SIZE-1); x++) {
             for (int y=1; y<(TER_SIZE-1); y++) {
                 if (!bfr[x + (y << TER_POW)] && (bfr[(x+1) + (y << TER_POW)] || bfr[(x-1) + (y << TER_POW)] || bfr[x + ((y+1) << TER_POW)] || bfr[x + ((y-1) << TER_POW)])) {
-                    if (!(rand()%50)) {
+                    if (!(rand()%20)) {
                         drawSprite(SSprite(sprites, 144, 0, 3, 2), Vector2i(x-1, y));
                     }
                     else if (!(rand()%400)) {

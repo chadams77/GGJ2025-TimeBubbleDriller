@@ -141,6 +141,23 @@ public:
     }
 };
 
+uint32_t blend ( uint32_t a, uint32_t b, float alpha ) {
+    int ar = (a >> 24u) & 0xFF;
+    int ag = (a >> 16u) & 0xFF;
+    int ab = (a >> 8u) & 0xFF;
+    int aa = (a >> 0u) & 0xFF;
+    int br = (b >> 24u) & 0xFF;
+    int bg = (b >> 16u) & 0xFF;
+    int bb = (b >> 8u) & 0xFF;
+    int ba = (b >> 0u) & 0xFF;
+    int t = (int)floor(alpha * 1023.);
+    int rr = max(0, min(255, (br * t + ar * (1023 - t)) >> 10));
+    int rg = max(0, min(255, (bg * t + ag * (1023 - t)) >> 10));
+    int rb = max(0, min(255, (bb * t + ab * (1023 - t)) >> 10));
+    int ra = max(0, min(255, (ba * t + aa * (1023 - t)) >> 10));
+    return (((uint32_t)rr) << 24u) | (((uint32_t)rg) << 16u) | (((uint32_t)rb) << 8u) | ((uint32_t)ra);
+}
+
 class Renderer {
 public:
     Texture texture;
@@ -195,6 +212,41 @@ public:
                 uint32_t v = rptr[x];
                 if (v > 0) {
                     wptr[x] = v;
+                }
+            }
+        }
+    }
+
+    void drawSpriteFade(SSprite sprite, Vector2f wp, Camera * camera, float alpha) {
+        Vector2f p = camera->project(wp);
+        drawSpriteFade(sprite, Vector2i(roundf(p.x), roundf(p.y)), alpha);
+    }
+
+    void drawSpriteFade(SSprite sprite, Vector2i p, float alpha) {
+        Vector2i bottom = p + sprite.size;
+        if (bottom.x < 0 || bottom.y < 0 || p.x >= REN_WIDTH || p.y >= REN_HEIGHT) {
+            return;
+        }
+        for (int y = 0; y < sprite.size.y; y++) {
+            if ((y+p.y) >= REN_HEIGHT) {
+                return;
+            }
+            if ((y+p.y) < 0) {
+                continue;
+            }
+            uint32_t const * rptr = sprite.sheet->bfr + (sprite.pos.y + y) * sprite.sheet->size.x + sprite.pos.x;
+            uint32_t * wptr = bfr + (y + p.y) * REN_WIDTH + p.x;
+            for (int x = 0; x < sprite.size.x; x++) {
+                if ((x+p.x) >= REN_WIDTH) {
+                    break;
+                }
+                if ((x+p.x) < 0) {
+                    continue;
+                }
+                uint32_t v = rptr[x];
+                if (v > 0) {
+                    const uint32_t ov = wptr[x];
+                    wptr[x] = blend(ov, v, alpha);
                 }
             }
         }
