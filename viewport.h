@@ -47,4 +47,6 @@ void OnResize (RenderWindow * window) {
     VP_WIDTH = window->getSize().x;
     VP_HEIGHT = window->getSize().y;
     window->setView(View(FloatRect(0.f, 0.f, (float)VP_WIDTH, (float)VP_HEIGHT)));
+    window->setMouseCursorVisible(false);
+    window->setFramerateLimit(60);
 }
