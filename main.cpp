@@ -11,6 +11,8 @@
 #include "viewport.h"
 #include "render.h"
 #include "ground.h"
+#include "lava.h"
+#include "player.h"
 
 using namespace sf;
 using std::cerr;
@@ -21,7 +23,6 @@ using std::map;
 using std::set;
 
 const char * WINDOW_TITLE = "Time-Bubble Driller";
-const double PI = 3.1415926535897932;
 
 RenderWindow * window = NULL;
 Renderer * renderer = NULL;
@@ -29,6 +30,8 @@ SpriteSheet * sprites = NULL;
 Camera * camera = NULL;
 Camera * uiCamera = NULL;
 Ground * ground = NULL;
+Lava * lava = NULL;
+Player * player = NULL;
 
 int main() {
 
@@ -46,13 +49,16 @@ int main() {
     camera = new Camera(Vector2f(0., 0.));
     uiCamera = new Camera();
 
+    lava = new Lava(2048.f + 512.f);
+
+    player = new Player(Vector2f(1023.f, 2047.f - 16.f));
+    player->a -= PI * 0.5f;
+
     renderer = new Renderer();
 
     double time = 0.;
     bool lMouseLeft = false, lMouseRight = false;
-
-    camera->lookAtSmooth(Vector2f(128., 128.), 0.5f);
-    
+   
     while (window->isOpen()) {
         Event event;
         while (window->pollEvent(event)) {
@@ -89,17 +95,21 @@ int main() {
         double dt = 1. / 60.;
         time += dt;
 
+        player->update(camera, sprites, ground, dt);
+
         camera->update(dt);
+        camera->bound(0.f, 0.f, (float)(TER_SIZE-1), (float)(TER_SIZE-1));
 
         ground->update(camera, dt);
+        lava->update(dt);
 
         renderer->clear();
 
-        ground->render(renderer, camera);
+        renderer->drawSprite(SSprite(sprites, 192, 0, 320, 240), Vector2i(0, 0));
 
-        renderer->drawSpriteRot(SSprite(sprites, 0, 0, 32, 32), Vector2f(64., 64.) + Vector2f(cos(time*2.), sin(time*2.)) * 12.f, time, camera);
-        renderer->drawSprite(SSprite(sprites, 0, 0, 32, 32), Vector2f(64., 64.), camera);
-        renderer->drawSpriteRot(SSprite(sprites, 0, 0, 32, 32), Vector2f(64., 64.) + Vector2f(cos(-time*2.), sin(-time*2.)) * 12.f, -time * 4., camera);
+        ground->render(renderer, camera);
+        player->render(renderer, camera, sprites);
+        lava->render(renderer, camera);
 
         renderer->render(window, dt);
 

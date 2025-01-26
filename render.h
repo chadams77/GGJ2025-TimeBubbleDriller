@@ -7,6 +7,7 @@ using std::cerr;
 using std::cout;
 using std::endl;
 
+const double PI = 3.1415926535897932;
 const int REN_WIDTH = 320, REN_HEIGHT = 240;
 
 static float max ( float a, float b ) {
@@ -32,8 +33,9 @@ class Camera {
 private:
     Vector2f hsz;
 public:
-    Vector2f p, toP;
+    Vector2f p, toP, off;
     float lookSpeed = 1.f;
+    float shake = 0.f;
 
     Camera(Vector2f _p) {
         hsz = Vector2f((float)REN_WIDTH, (float)REN_HEIGHT) * 0.5f;
@@ -45,17 +47,17 @@ public:
     }
 
     Vector2f project(Vector2f wp) {
-        return wp - p + hsz;
+        return wp - (p + off) + hsz;
     }
 
     Vector2f unproject(Vector2f sp) {
-        return sp - hsz + p;
+        return sp - hsz + p + off;
     }
 
     Vector2f unproject_real(Vector2i real) {
         double spx, spy;
         InvTransform(real.x, real.y, spx, spy);
-        return Vector2f(spx, spy) - hsz + p;
+        return Vector2f(spx, spy) - hsz + p + off;
     }
 
     void lookAt(Vector2f _p) {
@@ -68,8 +70,29 @@ public:
         lookSpeed = speed;
     }
 
+    void setShake(float s) {
+        shake = s;
+    }
+
+    void bound(float x1, float y1, float x2, float y2) {
+        if (p.x < (x1+320./2.)) {
+            p.x = x1+320./2.;
+        }
+        if (p.y < (y1+240./2.)) {
+            p.y = y1+240./2.;
+        }
+        if (p.x > (x2-320./2.)) {
+            p.x = x2-320./2.;
+        }
+        if (p.y > (y2-240./2.)) {
+            p.y = y2-240./2.;
+        }
+    }
+
     void update(float dt) {
         p += (toP - p) * dt * lookSpeed;
+        off = Vector2f((float)((rand()&63)-31), (float)((rand()&63)-31)) * shake * 0.025f;
+        shake = 0.;
     }
 };
 
