@@ -64,6 +64,10 @@ public:
             loose = true;
         }
 
+        if (loose) {
+            digf += (8.f - digf) * dt * 8.f;
+        }
+
         digf -= digf * dt * 4.f;
 
         if (crystal > 45.f) {
