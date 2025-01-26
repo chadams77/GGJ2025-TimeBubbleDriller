@@ -11,6 +11,7 @@
 
 #include "viewport.h"
 #include "render.h"
+#include "sound.h"
 #include "ground.h"
 #include "lava.h"
 #include "player.h"
@@ -69,6 +70,11 @@ int main() {
         delete window;
         cerr << "Error loading track.wav" << endl;
         exit(0);    
+    }
+
+    if (!loadSounds()) {
+        delete window;
+        exit(0);
     }
 
     sprites = new SpriteSheet("images/sprites.png");

@@ -56,11 +56,15 @@ public:
         else if (!loose) {
             if (!win) {
                 ngold *= 2.f;
+                playSound(SFX_WIN, 1., 0.5);
             }
             win = true;
         }
 
         if ((p.y > lavaY || p.y > 2047.f || p.x < 0.f || p.x > 2047.f) && !win) {
+            if (!loose) {
+                playSound(SFX_DIE, 1., 0.5);
+            }
             loose = true;
         }
 

@@ -230,24 +230,28 @@ public:
                                 countEmpty += 0.f;
                                 if (!(rand()&31)) {
                                     wptr[wx] = 0;
+                                    playSound(SFX_ROCK, 0.5, 0.25, 0.1);
                                 }
                             }
                             else if (gv == PAL_GREY_1) {
                                 countEmpty += 0.1f;
                                 if (!(rand()&15)) {
                                     wptr[wx] = 0;
+                                    playSound(SFX_ROCK, 0.5, 0.25, 0.1);
                                 }
                             }
                             else if (gv == PAL_BROWN_2) {
                                 countEmpty += 0.05f;
                                 if (!(rand()&7)) {
                                     wptr[wx] = 0;
+                                    playSound(SFX_ROCK, 0.75, 0.15, 0.1);
                                 }
                             }
                             else if (gv == PAL_BROWN_1) {
                                 countEmpty += 0.05f;
                                 if (!(rand()&3)) {
                                     wptr[wx] = 0;
+                                    playSound(SFX_ROCK, 0.75, 0.15, 0.1);
                                 }
                             }
                             else if (gv == PAL_GOLD_1 || gv == PAL_GOLD_2 || gv == PAL_GOLD_3) {
@@ -256,6 +260,7 @@ public:
                                     wptr[wx] = 0;
                                     gold += 1.f;
                                     spec = true;
+                                    playSound(SFX_GOLD, 0.75, 0.35, 0.5);
                                 }
                             }
                             else if (gv == PAL_PINK_1 || gv == PAL_PINK_2 || gv == PAL_PINK_3) {
@@ -264,12 +269,14 @@ public:
                                     wptr[wx] = 0;
                                     crystal += 1.f;
                                     spec = true;
+                                    playSound(SFX_CRYSTAL, 0.75, 0.35, 0.5);
                                 }
                             }
                             else if (gv == PAL_GREEN_1 || gv == PAL_GREEN_2) {
                                 countEmpty += 0.25f;
                                 if (!(rand()&3)) {
                                     wptr[wx] = 0;
+                                    playSound(SFX_ROCK, 0.75, 0.15, 0.1);
                                 }
                             }
                             if (wptr[wx] == 0 && !spec) {
@@ -380,9 +387,19 @@ public:
     }
 
     float warpf = 0.f;
+    bool wasSlowMo = false;
 
     void render (Renderer * renderer, Camera * camera, bool slowMo, Vector2f playerp, float dt) {
         uint32_t * wbfr = renderer->bfr;
+        if (wasSlowMo != slowMo) {
+            if (slowMo) {
+                playSound(SFX_CRYSTAL, 0.5, 0.35);
+            }
+            else {
+                playSound(SFX_CRYSTAL_B, 0.5, 0.35);
+            }
+            wasSlowMo = slowMo;
+        }
         if (slowMo) {
             warpf += (1. - warpf) * 16.f * dt;
         }
