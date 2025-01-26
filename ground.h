@@ -133,6 +133,18 @@ public:
                 v = (v * v * v) / 1000000;
                 v = max(0, min(4, v * 5 / 200));
                 bfr[x + (y << TER_POW)] = PAL[v];
+                if (y < 24) {
+                    int r = rand() % (y/4+1);
+                    if (r == 0 && v > 0) {
+                        bfr[x + (y << TER_POW)] = PAL_GREEN_1;
+                    }
+                }
+                if (y < 16) {
+                    int r = rand() % (y/2+1);
+                    if (r == 0 && v > 0) {
+                        bfr[x + (y << TER_POW)] = PAL_GREEN_2;
+                    }
+                }
             }
         }
 
@@ -252,6 +264,12 @@ public:
                                     wptr[wx] = 0;
                                     crystal += 1.f;
                                     spec = true;
+                                }
+                            }
+                            else if (gv == PAL_GREEN_1 || gv == PAL_GREEN_2) {
+                                countEmpty += 0.25f;
+                                if (!(rand()&3)) {
+                                    wptr[wx] = 0;
                                 }
                             }
                             if (wptr[wx] == 0 && !spec) {

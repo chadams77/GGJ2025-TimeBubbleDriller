@@ -53,7 +53,7 @@ int main() {
 
     lava = new Lava(2048.f + 512.f);
 
-    player = new Player(Vector2f(1023.f, 2047.f - 16.f));
+    player = new Player(Vector2f(1023.f, 48.f));//2047.f - 16.f));
     player->a -= PI * 0.5f;
 
     renderer = new Renderer();
@@ -97,7 +97,7 @@ int main() {
         double dt = 1. / 60.;
         time += dt;
 
-        bool slowMo = player->update(camera, sprites, ground, dt);
+        bool slowMo = player->update(camera, sprites, ground, lava->lavaY, dt);
         if (slowMo) {
             dt *= 0.25f;
         }
@@ -106,7 +106,9 @@ int main() {
         camera->bound(0.f, 0.f, (float)(TER_SIZE-1), (float)(TER_SIZE-1));
 
         ground->update(camera, dt);
-        lava->update(dt);
+        if (!player->win) {
+            lava->update(dt);
+        }
 
         renderer->clear();
 

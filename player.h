@@ -18,6 +18,8 @@ public:
     float atime;
     float ngold, gold;
     float crystal;
+    bool win, loose;
+    float wltime;
 
     Player(Vector2f _p = Vector2f(0.f, 0.f)) {
         p = _p;
@@ -30,9 +32,11 @@ public:
         gold = 0.f;
         ngold = 0.f;
         crystal = 10.f;
+        win = loose = false;
+        wltime = 0.f;
     }
 
-    bool update(Camera * camera, SpriteSheet * sprites, Ground * ground, float dt) {
+    bool update(Camera * camera, SpriteSheet * sprites, Ground * ground, float lavaY, float dt) {
 
         bool slowMo = false;
         if (Keyboard::isKeyPressed(Keyboard::Key::Space) && crystal > 0.f) {
@@ -45,29 +49,49 @@ public:
 
         gold += (ngold - gold) * dt * 2.5f;
 
-        float f = ground->dig(SSprite(sprites, 0, 0, 32, 32), p, a, ngold, crystal);
-        digf += (1.f - f);
+        if (p.y > 0.f) {
+            float f = ground->dig(SSprite(sprites, 0, 0, 32, 32), p, a, ngold, crystal);
+            digf += (1.f - f);
+        }
+        else if (!loose) {
+            win = true;
+        }
+
+        if ((p.y > lavaY || p.y > 2047.f || p.x < 0.f || p.x > 2047.f) && !win) {
+            loose = true;
+        }
+
         digf -= digf * dt * 4.f;
 
         if (crystal > 45.f) {
             crystal = 45.f;
         }
 
-        v -= v * 2.f * dt;
-        v -= v * min(max(digf, 0.f), 1.0f) * 0.25f;
-        av -= av * min(max(digf, 0.f), 1.0f) * 0.25f;
-        a -= av * 2.f * dt;
-        p += v * dt;
-        a += av * dt;
+        if (!win && !loose) {
 
-        if (Keyboard::isKeyPressed(Keyboard::Key::Left)) {
-            av += dt * 8.f * (slowMo ? 2.f : 1.f);
+            v -= v * 2.f * dt;
+            v -= v * min(max(digf, 0.f), 1.0f) * 0.25f;
+            av -= av * min(max(digf, 0.f), 1.0f) * 0.25f;
+            a -= av * 2.f * dt;
+            p += v * dt;
+            a += av * dt;
+
+            if (Keyboard::isKeyPressed(Keyboard::Key::Left)) {
+                av += dt * 8.f * (slowMo ? 2.f : 1.f);
+            }
+            if (Keyboard::isKeyPressed(Keyboard::Key::Right)) {
+                av -= dt * 8.f * (slowMo ? 2.f : 1.f);
+            }
+            if (Keyboard::isKeyPressed(Keyboard::Key::Up)) {
+                v += Vector2f(cosf(a-PI*0.5f), sinf(a-PI*0.5f)) * 240.f * dt * (slowMo ? 2.f : 1.f);
+            }
+
         }
-        if (Keyboard::isKeyPressed(Keyboard::Key::Right)) {
-            av -= dt * 8.f * (slowMo ? 2.f : 1.f);
+        else if (loose) {
+            p.y += 8.f * dt;
         }
-        if (Keyboard::isKeyPressed(Keyboard::Key::Up)) {
-            v += Vector2f(cosf(a-PI*0.5f), sinf(a-PI*0.5f)) * 240.f * dt * (slowMo ? 2.f : 1.f);
+        else if (win) {
+            p.y -= 8.f * dt;
         }
 
         camera->lookAtSmooth(p, 4.0f);
