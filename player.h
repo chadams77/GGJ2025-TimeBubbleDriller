@@ -40,7 +40,7 @@ public:
 
         bool slowMo = false;
         if (Keyboard::isKeyPressed(Keyboard::Key::Space) && crystal > 0.f) {
-            crystal -= dt * 4.f;
+            crystal -= dt * 6.f;
             slowMo = true;
             if (crystal < 0.f) {
                 crystal = 0.f;
@@ -83,15 +83,15 @@ public:
             v -= v * 2.f * dt;
             v -= v * min(max(digf, 0.f), 1.0f) * 0.25f;
             av -= av * min(max(digf, 0.f), 1.0f) * 0.25f;
-            a -= av * 2.f * dt;
-            p += v * dt;
+            a -= av * 4.f * dt;
+            p += 2.f * v * dt;
             a += av * dt;
 
             if (Keyboard::isKeyPressed(Keyboard::Key::Left)) {
-                av += dt * 8.f * (slowMo ? 2.f : 1.f);
+                av += dt * 10.f * (slowMo ? 2.f : 1.f);
             }
             if (Keyboard::isKeyPressed(Keyboard::Key::Right)) {
-                av -= dt * 8.f * (slowMo ? 2.f : 1.f);
+                av -= dt * 10.f * (slowMo ? 2.f : 1.f);
             }
             if (Keyboard::isKeyPressed(Keyboard::Key::Up)) {
                 v += Vector2f(cosf(a-PI*0.5f), sinf(a-PI*0.5f)) * 240.f * dt * (slowMo ? 2.f : 1.f);

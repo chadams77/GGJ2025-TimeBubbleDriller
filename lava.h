@@ -19,7 +19,7 @@ public:
     }
 
     void update(float dt) {
-        lavaY -= dt * 8.533f * 2.f;
+        lavaY -= dt * 8.533f * 4.f;
         atime += dt;
     }
 
