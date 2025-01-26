@@ -30,10 +30,10 @@ public:
                 Vector2f wp = camera->unproject(Vector2f((float)x, (float)y));
                 int tx = (int)roundf(wp.x), ty = (int)roundf(wp.y);
                 if (tx >= 0 && ty >= 0 && tx < TER_SIZE && ty < TER_SIZE) {
-                    if ((float)ty > (lavaY + powf(sinf(atime*6.f + (float)tx / 4.f) + 1.f, 0.33f) * 4.f)) {
+                    if ((float)ty > (min(lavaY, 2040.f) + powf(sinf(atime*6.f + (float)tx / 4.f) + 1.f, 0.33f) * 4.f)) {
                         *wbfr = 0xe35100ff;
                     }
-                    if ((float)ty > (lavaY + powf(sinf(-atime*4.f + (float)tx / 4.f) + 1.f, 0.33f) * 4.f)) {
+                    if ((float)ty > (min(lavaY, 2040.f) + powf(sinf(-atime*4.f + (float)tx / 4.f) + 1.f, 0.33f) * 4.f)) {
                         *wbfr = 0xb21030ff;
                     }
                 }
