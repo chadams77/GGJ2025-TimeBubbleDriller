@@ -62,7 +62,14 @@ int main() {
 
     window = new RenderWindow(VideoMode(800, 600), WINDOW_TITLE);
     window->setMouseCursorVisible(false);
-    window->setFramerateLimit(60);    
+    window->setFramerateLimit(60);
+
+    Music music;
+    if (!music.openFromFile("sfx/track.wav")) {
+        delete window;
+        cerr << "Error loading track.wav" << endl;
+        exit(0);    
+    }
 
     sprites = new SpriteSheet("images/sprites.png");
 
@@ -79,6 +86,10 @@ int main() {
     double animT = 0., initAnimT = 0.;
     int lastAnim = -1;
     bool initAnim = true;
+
+    music.setLoop(true);
+    music.setVolume(50.);
+    music.play();
    
     while (window->isOpen()) {
         Event event;
