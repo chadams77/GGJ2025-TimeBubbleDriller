@@ -239,13 +239,13 @@ public:
                                 }
                             }
                             else if (gv == PAL_BROWN_2) {
-                                countEmpty += 0.125f;
+                                countEmpty += 0.05f;
                                 if (!(rand()&7)) {
                                     wptr[wx] = 0;
                                 }
                             }
                             else if (gv == PAL_BROWN_1) {
-                                countEmpty += 0.25f;
+                                countEmpty += 0.05f;
                                 if (!(rand()&3)) {
                                     wptr[wx] = 0;
                                 }
