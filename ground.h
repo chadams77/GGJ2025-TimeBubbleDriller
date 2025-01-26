@@ -361,11 +361,23 @@ public:
         updatePHash();
     }
 
-    void render (Renderer * renderer, Camera * camera) {
+    float warpf = 0.f;
+
+    void render (Renderer * renderer, Camera * camera, bool slowMo, Vector2f playerp, float dt) {
         uint32_t * wbfr = renderer->bfr;
+        if (slowMo) {
+            warpf += (1. - warpf) * 16.f * dt;
+        }
+        else {
+            warpf += (0.f - warpf) * 16.f / 4.f * dt;
+        }
         for (int y=0; y<REN_HEIGHT; y++) {
             for (int x=0; x<REN_WIDTH; x++) {
                 Vector2f wp = camera->unproject(Vector2f((float)x, (float)y));
+                Vector2f dirp = wp - playerp;
+                float dist = sqrt(dirp.x*dirp.x + dirp.y*dirp.y) + 0.0001f;
+                float f = dist;
+                wp = wp * (1.f - warpf) + warpf * (playerp + dirp/dist * (powf(f/64.f, 1.25f)*64.f));
                 int tx = (int)roundf(wp.x), ty = (int)roundf(wp.y);
                 if (tx >= 0 && ty >= 0 && tx < TER_SIZE && ty < TER_SIZE) {
                     uint32_t clr = bfr[tx + (ty << TER_POW)];

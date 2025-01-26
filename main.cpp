@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <vector>
 #include <map>
 #include <set>
@@ -21,6 +22,7 @@ using std::endl;
 using std::vector;
 using std::map;
 using std::set;
+using std::ostringstream;
 
 const char * WINDOW_TITLE = "Time-Bubble Driller";
 
@@ -95,7 +97,10 @@ int main() {
         double dt = 1. / 60.;
         time += dt;
 
-        player->update(camera, sprites, ground, dt);
+        bool slowMo = player->update(camera, sprites, ground, dt);
+        if (slowMo) {
+            dt *= 0.25f;
+        }
 
         camera->update(dt);
         camera->bound(0.f, 0.f, (float)(TER_SIZE-1), (float)(TER_SIZE-1));
@@ -107,9 +112,32 @@ int main() {
 
         renderer->drawSprite(SSprite(sprites, 192, 0, 320, 240), Vector2i(0, 0));
 
-        ground->render(renderer, camera);
+        ground->render(renderer, camera, slowMo, player->p, dt);
         player->render(renderer, camera, sprites);
         lava->render(renderer, camera);
+
+        int money = (int)ceil(player->gold * 1000.f);
+        int crystal = max(0, min(45, (int)ceil(player->crystal / 25.f * 45.f)));
+
+        ostringstream oss;
+        oss << "$" << round(money);
+
+        renderer->drawSprite(SSprite(sprites, 4, 59, 47, 5), Vector2i(4, 4));
+        renderer->drawSprite(SSprite(sprites, 5, 54, crystal, 3), Vector2i(5, 5));
+
+        for (size_t i=0; i<oss.str().size(); i++) {
+            char ch = oss.str()[i];
+            if (ch == '$') {
+                renderer->drawSprite(SSprite(sprites, 0, 32, 16, 16), Vector2i(4, 10));
+            }
+            else {
+                renderer->drawSprite(SSprite(sprites, 16+16*(ch-'0'), 32, 16, 16), Vector2i(4+i*12, 10));
+            }
+        }
+
+        renderer->drawSprite(SSprite(sprites, 512, 0, 16, 240), Vector2i(320-16, 0));
+        int lv = max(0, min(240, (int)((lava->lavaY / (2048.f+512.f)) * 240.f)));
+        renderer->drawSprite(SSprite(sprites, 512+16, lv, 16, 240 - lv), Vector2i(320-16, lv));
 
         renderer->render(window, dt);
 
